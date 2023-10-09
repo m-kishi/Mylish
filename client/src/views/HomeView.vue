@@ -4,7 +4,7 @@
 <template>
   <div class="row menu">
     <div class="menu-item">
-      <a class="btn-large waves-effect teal start">スタート</a>
+      <a v-on:click="start" class="btn-large waves-effect teal start">スタート</a>
     </div>
     <div class="menu-item">
       <label>
@@ -19,14 +19,14 @@
       </label>
     </div>
   </div>
-  <div class="row">
-    <ul v-for="s in pagination" class="collection">
-      <li class="collection-item">
+  <div v-if="pagination.length > 0" class="row">
+    <ul class="collection">
+      <li v-for="s in pagination" class="collection-item">
         <div class="row" style="margin-bottom: auto;">
           <div class="col s4"><span>{{ s.started_at }}</span></div>
           <div class="col s1 right-align"><span>{{ s.corrected }}</span></div>
           <div class="col s1 right-align"><span>/</span></div>
-          <div class="col s1 right-align"><span>{{ s.answerd }}</span></div>
+          <div class="col s1 right-align"><span>{{ s.answered }}</span></div>
           <div class="col s2 right-align"><span>{{ s.rate }} &#37;</span></div>
           <span class="badge">
             <a href="#"><i class="material-icons icon-enable">delete</i></a>
@@ -35,7 +35,7 @@
       </li>
     </ul>
   </div>
-  <div class="row">
+  <div v-if="pagination.length > 0" class="row">
     <div class="col s12 center-align">
       <ul class="pagination">
         <li>
@@ -108,6 +108,8 @@
 </style>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'HomeView',
   // --------------------------------------------------
@@ -125,35 +127,20 @@ export default {
   // --------------------------------------------------
   mounted() {
     this.page_no = 1;
-    this.scores.push({ id: 1, started_at: '2023/10/01 12:00:00', answerd: 1, corrected: 20, rate: '50' })
-    this.scores.push({ id: 2, started_at: '2023/10/01 12:30:00', answerd: 11, corrected: 120, rate: '55' })
-    this.scores.push({ id: 3, started_at: '2023/10/01 13:45:00', answerd: 12, corrected: 20, rate: '60' })
-    this.scores.push({ id: 4, started_at: '2023/10/02 09:00:00', answerd: 13, corrected: 20, rate: '65' })
-    this.scores.push({ id: 5, started_at: '2023/10/03 11:00:00', answerd: 14, corrected: 20, rate: '70' })
-    this.scores.push({ id: 6, started_at: '2023/10/04 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 7, started_at: '2023/10/05 12:30:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 8, started_at: '2023/10/06 13:45:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 9, started_at: '2023/10/07 09:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 10, started_at: '2023/10/08 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 11, started_at: '2023/10/09 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 12, started_at: '2023/10/10 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 13, started_at: '2023/10/11 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 14, started_at: '2023/10/12 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 15, started_at: '2023/10/13 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 16, started_at: '2023/10/14 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 17, started_at: '2023/10/15 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 18, started_at: '2023/10/16 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 19, started_at: '2023/10/17 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 20, started_at: '2023/10/18 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 21, started_at: '2023/10/19 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 22, started_at: '2023/10/20 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 23, started_at: '2023/10/21 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 24, started_at: '2023/10/22 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 25, started_at: '2023/10/23 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 26, started_at: '2023/10/24 12:00:00', answerd: 100, corrected: 100, rate: '100' })
-    this.scores.push({ id: 27, started_at: '2023/10/25 12:00:00', answerd: 100, corrected: 100, rate: '100' })
+    axios.get('/get_scores')
+      .then(res => {
+        this.scores = res.data;
+      })
+      .catch(e => {
+        console.log(e);
+      });
   },
   methods: {
+    // --------------------------------------------------
+    // スタート
+    // --------------------------------------------------
+    start() {
+    },
     // --------------------------------------------------
     // 先頭ページへ
     // --------------------------------------------------
@@ -232,6 +219,9 @@ export default {
     // ページ切り替え
     // --------------------------------------------------
     pagination() {
+      if (this.scores.length == 0) {
+        return [];
+      }
       var str = (this.page_no - 1) * this.page_unit;
       var end = str + this.page_unit;
       if (end > this.scores.length) {
