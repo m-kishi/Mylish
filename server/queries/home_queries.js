@@ -17,4 +17,7 @@ module.exports = {
 		ORDER BY
 		    started_at DESC
 	`,
+	delete_score: `
+		DELETE FROM scores WHERE id = ?
+	`,
 };

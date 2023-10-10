@@ -29,7 +29,9 @@
           <div class="col s1 right-align"><span>{{ s.answered }}</span></div>
           <div class="col s2 right-align"><span>{{ s.rate }} &#37;</span></div>
           <span class="badge">
-            <a href="#"><i class="material-icons icon-enable">delete</i></a>
+            <a href="#" v-on:click.prevent="delete_score(s.id)">
+              <i class="material-icons waves-effect icon-enable">delete</i>
+            </a>
           </span>
         </div>
       </li>
@@ -127,19 +129,39 @@ export default {
   // --------------------------------------------------
   mounted() {
     this.page_no = 1;
-    axios.get('/get_scores')
-      .then(res => {
-        this.scores = res.data;
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    this.get_scores();
   },
   methods: {
+    // --------------------------------------------------
+    // スコア一覧を取得
+    // --------------------------------------------------
+    get_scores() {
+      axios.get('/get_scores')
+        .then(res => {
+          this.scores = res.data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
     // --------------------------------------------------
     // スタート
     // --------------------------------------------------
     start() {
+    },
+    // --------------------------------------------------
+    // スコアを削除
+    // --------------------------------------------------
+    delete_score(id) {
+      axios.post('/delete_score', {
+        id: id,
+      })
+        .then(res => {
+          this.get_scores();
+        })
+        .catch(e => {
+          console.log(e);
+        })
     },
     // --------------------------------------------------
     // 先頭ページへ
