@@ -4,16 +4,15 @@
 module.exports = {
 	create_scores: `
 		CREATE TABLE IF NOT EXISTS scores (
-		    id         TEXT --ID
+		    id         INTEGER PRIMARY KEY AUTOINCREMENT --ID
 		  , started_at DATE --日時
 		  , answered   INT  --回答数
 		  , corrected  INT  --正答数
-		  , PRIMARY KEY (id)
 		)
 	`,
-	create_details: `
-		CREATE TABLE IF NOT EXISTS details (
-		    score_id    TEXT --スコアID
+	create_grades: `
+		CREATE TABLE IF NOT EXISTS grades (
+		    score_id    INT  --スコアID
 		  , sentence_no INT  --文章番号
 		  , seq         INT  --出題順序
 		  , result      INT  --0:誤り/1:正解

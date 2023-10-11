@@ -8,13 +8,13 @@
     </div>
     <div class="menu-item">
       <label>
-        <input type="checkbox" />
+        <input type="checkbox" v-model="is_voice" />
         <span>音声</span>
       </label>
     </div>
     <div class="menu-item">
       <label>
-        <input type="checkbox" />
+        <input type="checkbox" v-model="is_random" />
         <span>ランダム</span>
       </label>
     </div>
@@ -122,6 +122,8 @@ export default {
       scores: [],
       page_no: 1,
       page_unit: 5,
+      is_voice: false,
+      is_random: false,
     };
   },
   // --------------------------------------------------
@@ -148,6 +150,14 @@ export default {
     // スタート
     // --------------------------------------------------
     start() {
+      axios.post('/start')
+        .then(res => {
+          console.log(res.data);
+          //this.$router.push({ name: 'exam', query: { id: 'id' } });
+        })
+        .catch(e => {
+          console.log(e);
+        })
     },
     // --------------------------------------------------
     // スコアを削除

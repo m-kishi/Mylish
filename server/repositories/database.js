@@ -17,7 +17,7 @@ module.exports = {
 			// テーブルの初期生成
 			db.serialize(() => {
 				db.run(query.create_scores);
-				db.run(query.create_details);
+				db.run(query.create_grades);
 				db.run(query.create_sentences);
 			});
 		});

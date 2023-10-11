@@ -20,25 +20,48 @@ router.get("/get_scores", async (req, res) => {
 });
 
 // ==================================================
-// スコアを削除
+// スタート
 // ==================================================
-router.post('/delete_score', async (req, res) => {
-	const { id } = req.body;
-
+router.post("/start", async (req, res) => {
 	var db = database.open();
-	var stmt = db.prepare(query.delete_score);
-	stmt.run(id, (err, result) => {
+	var stmt = db.prepare(query.start);
+	stmt.run((err, result) => {
 		if (err) {
 			res.status(500).json({
 				message: err.message,
 			});
 		} else {
 			res.status(200).json({
-				message: "OK",
+				id: stmt.lastID,
 			});
 		}
 		stmt.finalize();
 		db.close();
+	});
+});
+
+// ==================================================
+// スコアを削除
+// ==================================================
+router.post('/delete_score', async (req, res) => {
+	const { id } = req.body;
+	var db = database.open();
+	db.serialize(() => {
+		db.run('BEGIN TRANSACTION')
+		db.run(query.delete_score, [id]);
+		db.run(query.delete_grades, [id], (err, result) => {
+			if (err) {
+				res.status(500).json({
+					message: err.message,
+				});
+				return;
+			}
+			db.run('COMMIT');
+			res.status(200).json({
+				message: "OK",
+			});
+			db.close();
+		});
 	});
 });
 
