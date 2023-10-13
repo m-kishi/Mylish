@@ -152,8 +152,14 @@ export default {
     start() {
       axios.post('/start')
         .then(res => {
-          console.log(res.data);
-          //this.$router.push({ name: 'exam', query: { id: 'id' } });
+          this.$router.push({
+            name: 'exam',
+            query: {
+              id: res.data.id,
+              is_voice: this.is_voice,
+              is_random: this.is_random
+            }
+          });
         })
         .catch(e => {
           console.log(e);
