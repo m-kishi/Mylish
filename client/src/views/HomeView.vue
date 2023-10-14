@@ -4,7 +4,7 @@
 <template>
   <div class="row menu">
     <div class="menu-item">
-      <a v-on:click="start" class="btn-large waves-effect teal start">スタート</a>
+      <a v-on:click="start" class="btn-large waves-effect teal btn-mylish">スタート</a>
     </div>
     <div class="menu-item">
       <label>
@@ -78,10 +78,10 @@
   margin-right: 2.0rem;
 }
 
-.menu-item>a {
+/* .menu-item>a {
   font-size: 20px;
   font-weight: bold;
-}
+} */
 
 .menu-item>label {
   color: #009688;
@@ -106,6 +106,15 @@
 .page-label>span {
   font-size: 22px;
   font-weight: bold;
+}
+
+a.btn-mylish {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+input[type=text] {
+  font-size: 20px !important;
 }
 </style>
 
