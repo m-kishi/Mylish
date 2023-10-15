@@ -17,7 +17,7 @@ module.exports = {
       , seq         INT  --出題順序
       , result      INT  --0:誤り/1:正解
       , answer      TEXT --入力文章
-      , PRIMARY KEY (score_id)
+      , PRIMARY KEY (score_id, sentence_no)
     )
   `,
   create_sentences: `

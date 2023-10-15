@@ -78,11 +78,6 @@
   margin-right: 2.0rem;
 }
 
-/* .menu-item>a {
-  font-size: 20px;
-  font-weight: bold;
-} */
-
 .menu-item>label {
   color: #009688;
   font-weight: bold;

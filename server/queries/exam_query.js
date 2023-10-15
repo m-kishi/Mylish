@@ -22,4 +22,26 @@ module.exports = {
     ORDER BY
         A.no
   `,
+  submit: `
+    INSERT INTO grades (
+        score_id
+      , sentence_no
+      , seq
+      , result
+      , answer
+    ) VALUES (
+        ?
+      , ?
+      , ?
+      , ?
+      , ?
+    )
+  `,
+  exit: `
+  UPDATE scores
+  SET
+      answered = (SELECT COUNT(*) FROM grades WHERE score_id = ?)
+    , corrected = (SELECT COUNT(*) FROM grades WHERE score_id = ? AND result = 1)
+  WHERE id = ?
+  `,
 };
