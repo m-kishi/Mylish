@@ -23,7 +23,13 @@
     <ul class="collection">
       <li v-for="s in pagination" class="collection-item">
         <div class="row" style="margin-bottom: auto;">
-          <div class="col s4"><span>{{ s.started_at }}</span></div>
+          <div class="col s4">
+            <router-link :to="{
+              name: 'score',
+              query: { id: `${s.id}` }
+            }">{{ s.started_at }}
+            </router-link>
+          </div>
           <div class="col s1 right-align"><span>{{ s.corrected }}</span></div>
           <div class="col s1 right-align"><span>/</span></div>
           <div class="col s1 right-align"><span>{{ s.answered }}</span></div>

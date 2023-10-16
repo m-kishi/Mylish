@@ -54,12 +54,12 @@ router.post('/delete_score', async (req, res) => {
         res.status(500).json({
           message: err.message,
         });
-        return;
+      } else {
+        db.run('COMMIT');
+        res.status(200).json({
+          message: "OK",
+        });
       }
-      db.run('COMMIT');
-      res.status(200).json({
-        message: "OK",
-      });
       db.close();
     });
   });
