@@ -27,7 +27,7 @@
             <router-link :to="{
               name: 'score',
               query: { id: `${s.id}` }
-            }">{{ s.started_at }}
+            }" class="score-link">{{ s.started_at }}
             </router-link>
           </div>
           <div class="col s1 right-align"><span>{{ s.corrected }}</span></div>
@@ -87,6 +87,20 @@
 .menu-item>label {
   color: #009688;
   font-weight: bold;
+}
+
+a.score-link:link {
+  color: #009688;
+  font-weight: bold;
+}
+
+a.score-link:visited {
+  color: #009688;
+  font-weight: bold;
+}
+
+a.score-link:hover {
+  text-decoration: underline;
 }
 
 .icon-enable {
