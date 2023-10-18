@@ -21,6 +21,10 @@ router.get("/get_sentence", async (req, res) => {
       return
     }
     if (JSON.parse(is_random)) {
+      var min = 0;
+      var max = rows.length - 1;
+      var idx = Math.floor(Math.random() * (max + 1 - min)) + min;
+      res.json({ end_flg: false, sentence: rows[idx]});
     } else {
       res.json({ end_flg: false, sentence: rows[0] });
     }
