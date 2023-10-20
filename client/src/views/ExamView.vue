@@ -3,13 +3,18 @@
 // ================================================ -->
 <template>
   <div class="row margin">
-    No.{{ sentence.no }}
+    <div class="col s2">
+      No.{{ sentence.no }}
+    </div>
   </div>
-  <div class="row margin">
+  <div v-if="is_voice" class="row margin">
+    <audio controls :src="`voices/${sentence.no}.mp3`"></audio>
+  </div>
+  <div v-else class="row margin">
     {{ sentence.ja }}
   </div>
   <div class="row margin" style="position:relative;">
-    <input type="text" v-model="grades.answer" v-bind:readonly="show_answer" style="width:100%;">
+    <input type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter="submit" style="width:100%;">
     <img v-if="show_answer && grades.result == 1" alt="OK" :src="require(`@/assets/OK.svg`)" class="answer">
     <img v-if="show_answer && grades.result == 0" alt="NG" :src="require(`@/assets/NG.svg`)" class="answer">
   </div>
@@ -60,13 +65,13 @@ export default {
   // --------------------------------------------------
   data() {
     return {
-      id: null,
-      is_voice: null,
-      is_random: null,
+      id: 1,
+      is_voice: false,
+      is_random: false,
       is_continue: false,
       show_answer: false,
       sentence: {
-        no: null,
+        no: 1,
         en: null,
         ja: null,
       },
@@ -84,8 +89,8 @@ export default {
   // --------------------------------------------------
   mounted() {
     this.id = this.$route.query.id;
-    this.is_voice = this.$route.query.is_voice;
-    this.is_random = this.$route.query.is_random;
+    this.is_voice = JSON.parse(this.$route.query.is_voice);
+    this.is_random = JSON.parse(this.$route.query.is_random);
     this.get_sentence();
   },
   methods: {
@@ -119,6 +124,9 @@ export default {
     // 解答
     // --------------------------------------------------
     submit() {
+      if (this.show_answer) {
+        return;
+      }
       this.show_answer = true;
       if (this.sentence.en == this.grades.answer) {
         this.grades.result = 1;
