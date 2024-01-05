@@ -14,7 +14,7 @@
     {{ sentence.ja }}
   </div>
   <div class="row margin" style="position:relative;">
-    <input type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter="submit" style="width:100%;">
+    <textarea type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter.meta.exact="submit" style="width:100%;"></textarea>
     <img v-if="show_answer && grades.result == 1" alt="OK" :src="require(`@/assets/OK.svg`)" class="answer">
     <img v-if="show_answer && grades.result == 0" alt="NG" :src="require(`@/assets/NG.svg`)" class="answer">
   </div>
@@ -24,7 +24,7 @@
     </div>
   </div>
   <div class="row margin" v-if="show_answer">
-    <input type="text" v-model="sentence.en" readonly style="width:100%;">
+    <textarea type="text" v-model="sentence.en" readonly style="width:100%;"></textarea>
   </div>
   <div class="row" v-if="show_answer && is_continue">
     <div class="col s2 offset-s4">
@@ -123,7 +123,10 @@ export default {
     // --------------------------------------------------
     // 解答
     // --------------------------------------------------
-    submit() {
+    submit(e) {
+      if (!e.ctrlKey && !e.metaKey) {
+        return;
+      }
       if (this.show_answer) {
         return;
       }
