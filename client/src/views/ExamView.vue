@@ -82,6 +82,16 @@ export default {
         result: null,
         answer: null
       },
+      onp: {
+        sentence1: "",
+        sentence2: "",
+        operation_symbols: null,
+        operation_rich_text: null,
+        eg: null,
+        eg_i_arr: [null],
+        eg_j_arr: [null],
+        array_best_points: [null],
+      },
     };
   },
   // --------------------------------------------------
@@ -124,9 +134,9 @@ export default {
     // 解答
     // --------------------------------------------------
     submit(e) {
-      if (!e.ctrlKey && !e.metaKey) {
-        return;
-      }
+      // if (!e.ctrlKey && !e.metaKey) {
+      //   return;
+      // }
       if (this.show_answer) {
         return;
       }
@@ -136,6 +146,7 @@ export default {
       } else {
         this.grades.result = 0;
       }
+      this.diff(this.grades.answer, this.sentence.en);
       axios.post('/submit', this.grades)
         .then(res => {
           this.is_continue = !res.data.end_flg;
@@ -155,6 +166,279 @@ export default {
         .catch(e => {
           console.log(e);
         })
+    },
+    // --------------------------------------------------
+    // 差分の検出
+    // --------------------------------------------------
+    diff(sentence1, sentence2) {
+
+      // 初期化
+      this.onp.sentence1 = sentence1;
+      this.onp.sentence2 = sentence2;
+      this.onp.operation_symbols = null;
+      this.onp.operation_rich_text = null;
+      this.onp.eg = null;
+      this.onp.eg_i_arr = [null];
+      this.onp.eg_j_arr = [null];
+
+      // 差分計算
+      this.calc();
+    },
+    // --------------------------------------------------
+    // 差分計算
+    // --------------------------------------------------
+    calc() {
+
+      // エディットグラフを作成
+      this.init_edit_graph();
+      console.log(this.onp.eg_i_arr);
+      console.log(this.onp.eg_j_arr);
+      console.log(this.onp.eg);
+
+      // グラフの距離を算出
+      this.calc_edit_graph();
+
+      // バックポインタを辿って最短経路を決定
+      this.trace_back_pointers();
+
+      // 差分生成操作のシンボルを作成
+      this.calc_operation_symbols();
+
+      // 差分をグラフィカルに表示
+      this.generate_rich_text();
+    },
+    // --------------------------------------------------
+    // エディットグラフ初期化
+    // --------------------------------------------------
+    init_edit_graph() {
+
+      // 横の辺
+      for (var i = 0; i < this.onp.sentence1.length; i++) {
+        this.onp.eg_i_arr.push(this.onp.sentence1.charAt(i));
+      }
+
+      // 縦の辺
+      for (var j = 0; j < this.onp.sentence2.length; j++) {
+        this.onp.eg_j_arr.push(this.onp.sentence2.charAt(j));
+      }
+
+      // 盤面
+      this.onp.eg = [];
+      for (var i = 0; i <= this.onp.sentence1.length; i++) {
+        this.onp.eg.push([]);
+        for (var j = 0; j <= this.onp.sentence2.length; j++) {
+          this.onp.eg[i].push({
+            i: i,
+            j: j,
+            char_i: this.onp.eg_i_arr[i],
+            char_j: this.onp.eg_j_arr[j],
+            total_cost: 0,
+            prop: {
+              bp_i_minus: false,
+              bp_j_minus: false,
+              bp_i_j_minus: false,
+            }
+          })
+        }
+      }
+    },
+    // --------------------------------------------------
+    // グラフ上の各点の距離を算出
+    // --------------------------------------------------
+    calc_edit_graph() {
+
+      // すべての点に対してそれぞれ処理
+      for (var i = 0; i <= this.onp.sentence1.length; i++) {
+        for (var j = 0; j <= this.onp.sentence2.length; j++) {
+
+          // この点の前までの最小コスト
+          var info = this.min_cost_before(i, j);
+          var prev_min_cost = info.cost;
+
+          var p = this.onp.eg[i][j];
+
+          // この点が同じ文字かつ辺ではない
+          if (p.char_i == p.char_j && i > 0 && j > 0) {
+
+            // 左上の最小コストを引き継ぐ(バックポインタも左上を指す)
+            this.onp.eg[i][j].total_cost = this.onp.eg[i - 1][j - 1].total_cost;
+            p.prop.bp_i_minus = false;
+            p.prop.bp_j_minus = false;
+            p.prop.bp_i_j_minus = true;
+
+          } else {
+
+            // 前までの最小コストより1増える(バックポインタは前の最小コストを指す)
+            // console.log("i = " + i);
+            // console.log("j = " + j);
+            // console.log(this.onp.eg[i][j]);
+            this.onp.eg[i][j].total_cost = prev_min_cost + 1;
+
+          }
+        }
+      }
+    },
+    // --------------------------------------------------
+    // その点の前までの最小コスト
+    // --------------------------------------------------
+    min_cost_before(i, j) {
+      var p = this.onp.eg[i][j];
+      console.log("min_cost_before(" + i + ", " + j + ")");
+      console.log(p);
+
+      // 原点はコスト0
+      if (i == 0 && j == 0) {
+        return {
+          cost: -1, i: 0, j: 0,
+        }
+      }
+
+      // J方向へ
+      if (i == 0) {
+        p.prop.bp_i_minus = false;
+        p.prop.bp_j_minus = true;
+        p.prop.bp_i_j_minus = false;
+        return {
+          cost: this.onp.eg[i][j - 1].total_cost, i: 0, j: j - 1,
+        };
+      }
+
+      // I方向へ
+      if (j == 0) {
+        p.prop.bp_i_minus = true;
+        p.prop.bp_j_minus = false;
+        p.prop.bp_i_j_minus = false;
+        return {
+          cost: this.onp.eg[i - 1][j].total_cost, i: i - 1, j: 0,
+        };
+      }
+
+      // 盤面の場合，隣接する手前の点のうちコストが小さい方へ
+      var cost1 = this.onp.eg[i][j - 1].total_cost;
+      var cost2 = this.onp.eg[i - 1][j].total_cost;
+      if (cost1 < cost2) {
+        p.prop.bp_i_minus = false;
+        p.prop.bp_j_minus = true;
+        p.prop.bp_i_j_minus = false;
+        return {
+          cost: cost1, i: i, j: j - 1,
+        }
+      } else {
+        p.prop.bp_i_minus = true;
+        p.prop.bp_j_minus = false;
+        p.prop.bp_i_j_minus = false;
+        return {
+          cost: cost2, i: i - 1, j: j,
+        }
+      }
+    },
+    // --------------------------------------------------
+    // 末尾からバックポインタを辿る
+    // --------------------------------------------------
+    trace_back_pointers() {
+
+      // 末尾
+      var p = this.onp.eg[this.onp.sentence1.length][this.onp.sentence2.length];
+
+      var flag = true;
+      var bp_arr = [];
+      while (flag) {
+
+        // この座標とそのバックポインタの向きを記録
+        var position = this.get_back_pointer_position(p);
+        bp_arr.push({
+          i: p.i,
+          j: p.j,
+          char_i: p.char_i,
+          char_j: p.char_j,
+          s: position.s,
+          desc_seq: position.desc_seq,
+          desc_sym: position.desc_sym,
+          desc_html: position.desc_html,
+        });
+
+        if (p.i == 0 && p.j == 0) {
+          // 始点まで戻ったら終了
+          flag = false;
+        } else {
+          // 手前の点へ
+          p = this.onp.eg[position.i][position.j];
+        }
+      }
+
+      // 先頭からに並び替えて保存
+      bp_arr.reverse();
+      this.onp.array_best_points = bp_arr;
+    },
+    // --------------------------------------------------
+    // バックポインタの情報を取得
+    // --------------------------------------------------
+    get_back_pointer_position(p) {
+
+      console.log("get_back_pointer_position");
+      console.log(p);
+
+      if (p.prop.bp_i_minus) {
+        return {
+          i: p.i - 1,
+          j: p.j,
+          s: "i - 1",
+          w: "↑",
+          desc_seq: "旧文字「" + p.char_i + "」を削除",
+          desc_sym: "-" + p.char_i,
+          desc_html: '<span class="_diff_del">' + p.char_i + '</span>',
+        };
+      }
+
+      if (p.prop.bp_j_minus) {
+        return {
+          i: p.i,
+          j: p.j - 1,
+          s: "j - 1",
+          w: "←",
+          desc_seq: "新文字「" + p.char_j + "」を追加",
+          desc_sym: "+" + p.char_j,
+          desc_html: '<span class="_diff_add">' + p.char_j + '</span>',
+        };
+      }
+
+      if (p.prop.bp_i_j_minus) {
+        return {
+          i: p.i - 1,
+          j: p.j - 1,
+          s: "ij - 1",
+          w: "＼",
+          desc_seq: "同文字「" + p.char_i + "」",
+          desc_sym: p.char_i,
+          desc_html: '<span class="_diff_keep">' + p.char_i + '</span>',
+        };
+      }
+
+      return {
+        s: null,
+        w: "◯",
+        desc_seq: "差分をスタート",
+      };
+
+    },
+    // --------------------------------------------------
+    // 差分操作を表すシンボル文字列表記を取得
+    // --------------------------------------------------
+    calc_operation_symbols() {
+      this.onp.operation_symbols = this.onp.array_best_points.map(item => {
+        return item.desc_sym;
+      }).filter(item => {
+        return item && ("" + item).length > 0;
+      }).join(",");
+    },
+    // --------------------------------------------------
+    // 差分操作を表すシンボル文字列表記を取得
+    // --------------------------------------------------
+    generate_rich_text() {
+      this.onp.operation_rich_text = this.onp.array_best_points.map(item => {
+        return item.desc_html;
+      }).join("");
+      console.log(this.onp.operation_rich_text);
     },
   },
 }
