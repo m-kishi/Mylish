@@ -14,9 +14,12 @@
     {{ sentence.ja }}
   </div>
   <div class="row margin" style="position:relative;">
-    <textarea type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter.meta.exact="submit" style="width:100%;"></textarea>
+    <textarea type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter.meta.exact="submit"
+      style="width:100%;"></textarea>
     <img v-if="show_answer && grades.result == 1" alt="OK" :src="require(`@/assets/OK.svg`)" class="answer">
     <img v-if="show_answer && grades.result == 0" alt="NG" :src="require(`@/assets/NG.svg`)" class="answer">
+    <div v-html="onp.operation_rich_text"></div>
+    <!-- I don't trust any candidate. To begin with they make promises they don't keep. -->
   </div>
   <div class="row" v-if="!show_answer">
     <div class="col s2 offset-s5">
@@ -53,6 +56,24 @@ img.answer {
   transform: translate(-145%, -70%);
   width: 1.0rem;
   height: 1.0rem;
+}
+
+span._diff_add {
+  color: blue;
+  font-weight: bold;
+}
+
+span._diff_del {
+  color: red;
+  font-weight: bold;
+
+  text-decoration: line-through;
+  text-decoration-color: maroon;
+  -moz-text-decoration-color: maroon;
+}
+
+span._diff_keep {
+  color: dimgray;
 }
 </style>
 <script>
