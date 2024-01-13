@@ -3,23 +3,19 @@
 // ================================================ -->
 <template>
   <div class="row margin">
-    <div class="col s2">
-      No.{{ sentence.no }}
-    </div>
+    No.{{ sentence.no }}
   </div>
   <div v-if="is_voice" class="row margin">
     <audio controls :src="`voices/${sentence.no}.mp3`"></audio>
   </div>
   <div v-else class="row margin">
-    {{ sentence.ja }}
+    <div v-html="sentence.ja"></div>
   </div>
   <div class="row margin" style="position:relative;">
     <textarea type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter.meta.exact="submit"
       style="width:100%;"></textarea>
     <img v-if="show_answer && grades.result == 1" alt="OK" :src="require(`@/assets/OK.svg`)" class="answer">
     <img v-if="show_answer && grades.result == 0" alt="NG" :src="require(`@/assets/NG.svg`)" class="answer">
-    <div v-html="onp.operation_rich_text"></div>
-    <!-- I don't trust any candidate. To begin with they make promises they don't keep. -->
   </div>
   <div class="row" v-if="!show_answer">
     <div class="col s2 offset-s5">
@@ -27,7 +23,16 @@
     </div>
   </div>
   <div class="row margin" v-if="show_answer">
-    <textarea type="text" v-model="sentence.en" readonly style="width:100%;"></textarea>
+    <hr>
+  </div>
+  <div class="row margin" v-if="show_answer">
+    <div v-html="sentence.en"></div>
+  </div>
+  <div class="row margin" v-if="show_answer">
+    <hr>
+  </div>
+  <div class="row margin" v-if="show_answer">
+    <div v-html="onp.operation_rich_text"></div>
   </div>
   <div class="row" v-if="show_answer && is_continue">
     <div class="col s2 offset-s4">
@@ -154,20 +159,19 @@ export default {
     // --------------------------------------------------
     // 解答
     // --------------------------------------------------
-    submit(e) {
-      // if (!e.ctrlKey && !e.metaKey) {
-      //   return;
-      // }
+    submit() {
       if (this.show_answer) {
         return;
       }
       this.show_answer = true;
-      if (this.sentence.en == this.grades.answer) {
+      var ja_answer = this.grades.answer.replace(/\n/g, " ");
+      var en_answer = this.sentence.en.replaceAll("<br>", " ");
+      if (en_answer == ja_answer) {
         this.grades.result = 1;
       } else {
         this.grades.result = 0;
       }
-      this.diff(this.grades.answer, this.sentence.en);
+      this.diff(this.grades.answer, en_answer);
       axios.post('/submit', this.grades)
         .then(res => {
           this.is_continue = !res.data.end_flg;
@@ -212,9 +216,6 @@ export default {
 
       // エディットグラフを作成
       this.init_edit_graph();
-      console.log(this.onp.eg_i_arr);
-      console.log(this.onp.eg_j_arr);
-      console.log(this.onp.eg);
 
       // グラフの距離を算出
       this.calc_edit_graph();
@@ -290,9 +291,6 @@ export default {
           } else {
 
             // 前までの最小コストより1増える(バックポインタは前の最小コストを指す)
-            // console.log("i = " + i);
-            // console.log("j = " + j);
-            // console.log(this.onp.eg[i][j]);
             this.onp.eg[i][j].total_cost = prev_min_cost + 1;
 
           }
@@ -304,8 +302,6 @@ export default {
     // --------------------------------------------------
     min_cost_before(i, j) {
       var p = this.onp.eg[i][j];
-      console.log("min_cost_before(" + i + ", " + j + ")");
-      console.log(p);
 
       // 原点はコスト0
       if (i == 0 && j == 0) {
@@ -396,9 +392,6 @@ export default {
     // --------------------------------------------------
     get_back_pointer_position(p) {
 
-      console.log("get_back_pointer_position");
-      console.log(p);
-
       if (p.prop.bp_i_minus) {
         return {
           i: p.i - 1,
@@ -459,7 +452,6 @@ export default {
       this.onp.operation_rich_text = this.onp.array_best_points.map(item => {
         return item.desc_html;
       }).join("");
-      console.log(this.onp.operation_rich_text);
     },
   },
 }
