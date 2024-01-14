@@ -3,17 +3,17 @@
 // ================================================ -->
 <template>
   <div class="row margin">
-    No.{{ sentence.no }}
+    <div style="display:flex; align-items:center;">
+      <div style="margin-right:1.0rem;">No.{{ sentence.no }}</div>
+      <div><audio controls :src="`voices/${sentence.no}.mp3`" style="vertical-align:middle;"></audio></div>
+    </div>
   </div>
-  <div v-if="is_voice" class="row margin">
-    <audio controls :src="`voices/${sentence.no}.mp3`"></audio>
-  </div>
-  <div v-else class="row margin">
+  <div class="row margin">
     <div v-html="sentence.ja"></div>
   </div>
   <div class="row margin" style="position:relative;">
-    <textarea type="text" v-model="grades.answer" v-bind:readonly="show_answer" v-on:keydown.enter.meta.exact="submit"
-      style="width:100%;"></textarea>
+    <textarea type="text" v-model="grades.answer" v-if="!show_answer" v-on:keydown.enter.meta.exact="submit"></textarea>
+    <textarea type="text" v-model="grades.answer" v-if="show_answer" readonly></textarea>
     <img v-if="show_answer && grades.result == 1" alt="OK" :src="require(`@/assets/OK.svg`)" class="answer">
     <img v-if="show_answer && grades.result == 0" alt="NG" :src="require(`@/assets/NG.svg`)" class="answer">
   </div>
@@ -27,9 +27,6 @@
   </div>
   <div class="row margin" v-if="show_answer">
     <div v-html="sentence.en"></div>
-  </div>
-  <div class="row margin" v-if="show_answer">
-    <hr>
   </div>
   <div class="row margin" v-if="show_answer">
     <div v-html="onp.operation_rich_text"></div>
@@ -52,6 +49,10 @@
 .margin {
   margin-left: 2.0rem;
   margin-right: 1.0rem;
+}
+
+textarea {
+  width: 100%;
 }
 
 img.answer {
@@ -92,7 +93,6 @@ export default {
   data() {
     return {
       id: 1,
-      is_voice: false,
       is_random: false,
       is_continue: false,
       show_answer: false,
@@ -106,7 +106,8 @@ export default {
         sentence_no: null,
         seq: 0,
         result: null,
-        answer: null
+        answer: null,
+        answer_fixed: null,
       },
       onp: {
         sentence1: "",
@@ -125,7 +126,6 @@ export default {
   // --------------------------------------------------
   mounted() {
     this.id = this.$route.query.id;
-    this.is_voice = JSON.parse(this.$route.query.is_voice);
     this.is_random = JSON.parse(this.$route.query.is_random);
     this.get_sentence();
   },
@@ -164,6 +164,7 @@ export default {
         return;
       }
       this.show_answer = true;
+      this.grades.answer_fixed = this.grades.answer.replace(/\n/g, "<br>");
       var ja_answer = this.grades.answer.replace(/\n/g, " ");
       var en_answer = this.sentence.en.replaceAll("<br>", " ");
       if (en_answer == ja_answer) {
@@ -171,7 +172,9 @@ export default {
       } else {
         this.grades.result = 0;
       }
+
       this.diff(this.grades.answer, en_answer);
+
       axios.post('/submit', this.grades)
         .then(res => {
           this.is_continue = !res.data.end_flg;

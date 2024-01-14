@@ -24,7 +24,7 @@
             No. {{ g.seq }}
           </div>
           <div class="col s11">
-            {{ g.ja }}
+            <div v-html="g.ja"></div>
           </div>
         </div>
         <div class="row grade-row">
@@ -37,7 +37,7 @@
             </template>
           </div>
           <div class="col s11">
-            {{ g.answer }}
+            <div v-html="g.answer"></div>
           </div>
         </div>
       </li>

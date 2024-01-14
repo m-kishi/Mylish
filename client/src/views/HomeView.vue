@@ -8,12 +8,6 @@
     </div>
     <div class="menu-item">
       <label>
-        <input type="checkbox" v-model="is_voice" />
-        <span>音声</span>
-      </label>
-    </div>
-    <div class="menu-item">
-      <label>
         <input type="checkbox" v-model="is_random" />
         <span>ランダム</span>
       </label>
@@ -146,7 +140,6 @@ export default {
       scores: [],
       page_no: 1,
       page_unit: 5,
-      is_voice: false,
       is_random: false,
     };
   },
@@ -180,7 +173,6 @@ export default {
             name: 'exam',
             query: {
               id: res.data.id,
-              is_voice: this.is_voice,
               is_random: this.is_random
             }
           });

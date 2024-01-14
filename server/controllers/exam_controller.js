@@ -43,7 +43,7 @@ router.post("/submit", async (req, res) => {
     grade.sentence_no,
     grade.seq,
     grade.result,
-    grade.answer
+    grade.answer_fixed
   ], (err, result) => {
     stmt.finalize();
     if (err) {
