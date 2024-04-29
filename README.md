@@ -31,3 +31,11 @@ npm run serve
 ```
 npm run start-watch
 ```
+
+- 初期データ流し込み
+```
+rm Mylish.db
+sqlite3 Mylish.db
+> .mode csv
+> .import sentences.csv sentences
+```

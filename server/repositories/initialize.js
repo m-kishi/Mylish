@@ -22,7 +22,7 @@ module.exports = {
   `,
   create_sentences: `
     CREATE TABLE IF NOT EXISTS sentences (
-        no INT  --番号
+        no TEXT --番号
       , en TEXT --英文
       , ja TEXT --和訳
       , PRIMARY KEY (no)
