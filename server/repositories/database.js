@@ -18,6 +18,7 @@ module.exports = {
       db.serialize(() => {
         db.run(query.create_scores);
         db.run(query.create_grades);
+        db.run(query.create_idioms);
         db.run(query.create_sentences);
       });
     });

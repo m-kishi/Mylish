@@ -37,5 +37,13 @@ npm run start-watch
 rm Mylish.db
 sqlite3 Mylish.db
 > .mode csv
-> .import sentences.csv sentences
+> .import data/sentences.csv sentences
+> .import data/idioms.csv idioms
+```
+
+- production 環境ビルド
+```
+cd client
+export UV_USE_IO_URING=0
+npm run build
 ```

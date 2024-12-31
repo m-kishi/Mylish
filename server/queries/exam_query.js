@@ -37,6 +37,20 @@ module.exports = {
       , ?
     )
   `,
+  select_idioms: `
+    SELECT
+        A.no  AS no
+      , A.seq AS seq
+      , A.en  AS en
+      , A.ja  AS ja
+    FROM
+        idioms A
+    WHERE
+        A.no = ?
+    ORDER BY
+        A.no
+      , A.seq
+  `,
   exit: `
   UPDATE scores
   SET

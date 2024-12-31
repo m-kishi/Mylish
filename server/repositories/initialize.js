@@ -20,6 +20,15 @@ module.exports = {
       , PRIMARY KEY (score_id, sentence_no)
     )
   `,
+  create_idioms: `
+    CREATE TABLE IF NOT EXISTS idioms (
+        no  TEXT --番号
+      , seq INT  --順番
+      , en  TEXT --熟語
+      , ja  TEXT --和訳
+      , PRIMARY KEY (no, seq)
+    )
+  `,
   create_sentences: `
     CREATE TABLE IF NOT EXISTS sentences (
         no TEXT --番号

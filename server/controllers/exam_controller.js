@@ -67,7 +67,19 @@ router.post("/submit", async (req, res) => {
 });
 
 // ==================================================
-// 解答
+// 単語・熟語を取得
+// ==================================================
+router.get("/get_idioms", async (req, res) => {
+  const no = req.query.no;
+  var db = database.open();
+  db.all(query.select_idioms, [no], (err, rows) => {
+    db.close();
+    res.json(rows);
+  });
+});
+
+// ==================================================
+// 終了
 // ==================================================
 router.post("/exit", async (req, res) => {
   const { id } = req.body;

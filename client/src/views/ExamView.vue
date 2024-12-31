@@ -44,6 +44,16 @@
       <a v-on:click.prevent="exit" class="btn-large waves-effect btn-mylish">終了</a>
     </div>
   </div>
+  <div class="row" v-if="show_answer">
+    <table>
+      <tbody>
+        <tr v-for="idiom in idioms">
+          <td>{{ idiom.en }}</td>
+          <td>{{ idiom.ja }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 <style>
 .margin {
@@ -109,6 +119,9 @@ export default {
         answer: null,
         answer_fixed: null,
       },
+      idioms: [
+        { no: 0, seq: 0, en: "", ja: "" }
+      ],
       onp: {
         sentence1: "",
         sentence2: "",
@@ -178,10 +191,30 @@ export default {
       axios.post('/submit', this.grades)
         .then(res => {
           this.is_continue = !res.data.end_flg;
+          this.get_idioms();
         })
         .catch(e => {
           console.log(e);
         })
+    },
+    // --------------------------------------------------
+    // 単語・熟語を取得
+    // --------------------------------------------------
+    get_idioms() {
+      axios.get('/get_idioms', {
+        params: {
+          no: this.sentence.no,
+        },
+      })
+        .then(res => {
+          this.idioms.length = 0;
+          for (const idiom of res.data) {
+            this.idioms.push(idiom);
+          }
+        })
+        .catch(e => {
+          console.log(e);
+        });
     },
     // --------------------------------------------------
     // 終了
