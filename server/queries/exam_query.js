@@ -7,6 +7,7 @@ module.exports = {
         A.no AS no
       , A.en AS en
       , A.ja AS ja
+      , (SELECT COUNT(*) FROM grades X WHERE X.score_id = ?) AS count
     FROM
         sentences A
     WHERE

@@ -6,6 +6,7 @@
     <div style="display:flex; align-items:center;">
       <div style="margin-right:1.0rem;">No.{{ sentence.no }}</div>
       <div><audio controls :src="`voices/${sentence.no}.mp3`" style="vertical-align:middle;"></audio></div>
+      <div style="margin-left:1.0rem;">{{ sentence.count }}</div>
     </div>
   </div>
   <div class="row margin">
@@ -107,9 +108,10 @@ export default {
       is_continue: false,
       show_answer: false,
       sentence: {
-        no: 1,
+        no: "001",
         en: null,
         ja: null,
+        count: null,
       },
       grades: {
         score_id: null,

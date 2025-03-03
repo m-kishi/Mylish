@@ -32,5 +32,5 @@ app.use("/", exam_controller);
 var score_controller = require("./controllers/score_controller");
 app.use("/", score_controller);
 
-// 3000番ポートで起動
-app.listen(3000, () => console.log('Mylish Server is running on port 3000.'));
+// 3000番ポートで起動(本番：3001)
+app.listen(3001, () => console.log('Mylish Server is running on port 3001.'));
