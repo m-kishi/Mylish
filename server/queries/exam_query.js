@@ -2,6 +2,14 @@
 // ©2023 https://github.com/m-kishi
 // ==================================================
 module.exports = {
+  select_grades: `
+    SELECT
+        A.sentence_no
+    FROM
+        grades A
+    WHERE
+        A.score_id = $1
+  `,
   select_sentence: `
     SELECT
         A.no AS no
@@ -53,10 +61,10 @@ module.exports = {
       , A.seq
   `,
   exit: `
-  UPDATE scores
-  SET
-      answered = (SELECT COUNT(*) FROM grades WHERE score_id = ?)
-    , corrected = (SELECT COUNT(*) FROM grades WHERE score_id = ? AND result = 1)
-  WHERE id = ?
+    UPDATE scores
+    SET
+        answered = (SELECT COUNT(*) FROM grades WHERE score_id = ?)
+      , corrected = (SELECT COUNT(*) FROM grades WHERE score_id = ? AND result = 1)
+    WHERE id = ?
   `,
 };

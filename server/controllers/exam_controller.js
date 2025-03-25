@@ -15,19 +15,26 @@ router.get("/get_sentence", async (req, res) => {
   const { id, is_random } = req.query;
   var db = database.open();
   db.all(query.select_sentence, [id], (err, rows) => {
-    db.close();
-    if (rows.length == 0) {
-      res.json({ end_flg: true });
-      return
-    }
-    if (JSON.parse(is_random)) {
-      var min = 0;
-      var max = rows.length - 1;
-      var idx = Math.floor(Math.random() * (max + 1 - min)) + min;
-      res.json({ end_flg: false, sentence: rows[idx]});
-    } else {
-      res.json({ end_flg: false, sentence: rows[0] });
-    }
+    db.get(query.select_grades, [id], (err, grades) => {
+      db.close();
+      if (rows.length == 0) {
+        res.json({ end_flg: true });
+        return
+      }
+      if (JSON.parse(is_random)) {
+        var min = 0;
+        var max = rows.length - 1;
+        var idx = Math.floor(Math.random() * (max + 1 - min)) + min;
+        if (grades && grades.length > 0) {
+          while (grades.find(x => x.sentence_no == rows[idx].no)) {
+            idx = Math.floor(Math.random() * (max + 1 - min)) + min;
+          }  
+        }
+        res.json({ end_flg: false, sentence: rows[idx]});
+      } else {
+        res.json({ end_flg: false, sentence: rows[0] });
+      }  
+    });
   });
 });
 
